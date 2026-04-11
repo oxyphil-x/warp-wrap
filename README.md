@@ -1,14 +1,3 @@
-To keep it as streamlined as possible, here is the one-liner that downloads the deployment script, makes it executable, and runs it immediately with root privileges.
-
-### The One-Liner
-```bash
-curl -fsSL https://raw.githubusercontent.com/kfomichev/warp-wrap/main/deploy-warp.sh -o deploy-warp.sh && chmod +x deploy-warp.sh && sudo ./deploy-warp.sh
-```
-
----
-
-### Revised README.md
-Since you now have a dedicated repository, here is a professional **README.md** tailored for your GitHub landing page.
 
 # WARP-Wrap
 **An automated high-performance gateway bridging AmneziaWG obfuscation with Cloudflare WARP routing.**
