@@ -1,55 +1,46 @@
-# WARP-over-Amnezia Gateway
+To keep it as streamlined as possible, here is the one-liner that downloads the deployment script, makes it executable, and runs it immediately with root privileges.
 
-### Tunnel Purpose and Concept
-The primary goal of this project is to create a **Nested VPN Gateway**. While AmneziaWG provides an obfuscated entry point to bypass restrictive firewalls, routing that traffic through Cloudflare WARP adds an additional layer of anonymity and allows the server to act as a transparent proxy for all connected clients.
-
-* **Entry Point**: Clients connect via AmneziaWG (Interface: `amn0`).
-* **Exit Point**: All client traffic is "wrapped" and sent out via Cloudflare WARP (Interface: `wgcf-profile`).
-* **Use Case**: Bypassing censorship while maintaining high-speed routing through Cloudflare’s global network.
-
-### Routing Scheme
-This setup uses **Policy-Based Routing (PBR)** to ensure that the server remains manageable (SSH stays open) while client traffic is force-routed through the tunnel.
-
-| Priority | Action | Purpose |
-| :--- | :--- | :--- |
-| **90** | `lookup main` | **Loop Breaker**: Forces Amnezia's encrypted UDP traffic to use the physical internet, preventing a routing loop. |
-| **100** | `lookup 51820` | **The Wrap**: Forces all decrypted traffic from the `amn0` subnet into the WARP interface. |
-| **Default** | `lookup main` | **SSH Safety**: Ensures standard server traffic (like your SSH session) ignores the VPN and stays on the main internet. |
-
-### The Deployment Script
-The `deploy-warp.sh` file is an all-in-one automation tool designed for fresh Debian/Ubuntu systems.
-
-**What it does:**
-1.  **Dependency Management**: Installs `wireguard-tools`, `jq`, `resolvconf`, and `docker` utilities.
-2.  **Binary Acquisition**: Dynamically fetches the latest version of `wgcf` from GitHub.
-3.  **WARP Registration**: Automatically registers a new Cloudflare account and generates the `.conf` profile.
-4.  **Auto-Hardening**: Patches the config with `Table = off` to prevent system-wide lockouts and adds `PersistentKeepalive` for stability.
-5.  **Smart Detection**: On every start, the script "sniffs" the environment to detect the `amn0` subnet and the specific Docker/System port Amnezia is listening on.
-
-**How to run it:**
+### The One-Liner
 ```bash
-chmod +x deploy-warp.sh
-sudo ./deploy-warp.sh
+curl -fsSL https://raw.githubusercontent.com/kfomichev/warp-wrap/main/deploy-warp.sh -o deploy-warp.sh && chmod +x deploy-warp.sh && sudo ./deploy-warp.sh
 ```
 
-### Service Management
-The installation creates a systemd service to manage the tunnel lifecycle and a watchdog to ensure 99.9% uptime.
+---
 
-**Start the tunnel:**
+### Revised README.md
+Since you now have a dedicated repository, here is a professional **README.md** tailored for your GitHub landing page.
+
+# WARP-Wrap
+**An automated high-performance gateway bridging AmneziaWG obfuscation with Cloudflare WARP routing.**
+
+### 🚀 Concept
+This project solves the "Censorship vs. Performance" trade-off. **AmneziaWG** (running on `amn0`) provides an obfuscated entry point to bypass deep-packet inspection (DPI). All traffic entering this gate is then wrapped into **Cloudflare WARP** (`wgcf-profile`) for optimized global routing and privacy.
+
+### 🛣 Routing Scheme
+The gateway uses Policy-Based Routing (PBR) to ensure the server remains accessible via SSH while tunneling all client traffic.
+
+* **Priority 90 (Loop Breaker):** Detects the AmneziaWG UDP port and forces it through the physical internet (Table: `main`) to prevent recursive tunnel loops.
+* **Priority 100 (The Wrap):** All traffic originating from the `amn0` subnet is force-routed into Table `51820` (the WARP interface).
+* **Management:** Standard server traffic (SSH/Updates) stays on the default gateway for zero-lockout reliability.
+
+### 🛠 Installation & Usage
+The deployment script is designed for Debian/Ubuntu systems. It dynamically detects your environment (Docker/Bare-metal) and configures everything in one pass.
+
+**Run the installer:**
 ```bash
-sudo systemctl start warp-tunnel
+curl -fsSL https://raw.githubusercontent.com/kfomichev/warp-wrap/main/deploy-warp.sh -o deploy-warp.sh && chmod +x deploy-warp.sh && sudo ./deploy-warp.sh
 ```
 
-**Enable on boot:**
-```bash
-sudo systemctl enable warp-tunnel
-```
+**What happens during deployment:**
+1.  Downloads the latest `wgcf` binary from GitHub.
+2.  Registers a new WARP account and patches the config for `Table = off`.
+3.  Automatically detects the `amn0` subnet and listening port (via Docker or System Sockets).
+4.  Sets up a **1-minute Watchdog** via Crontab.
 
-**Stop and Cleanup:**
-The service is configured with a custom `ExecStop` that triggers a full cleanup, removing all IPTables rules and routing policies to return the server to its original state.
-```bash
-sudo systemctl stop warp-tunnel
-```
+### ⚙️ Service Management
+The tunnel is managed as a standard Systemd service.
 
-**Health Check:**
-A watchdog script runs every **1 minute** via crontab. It pings `1.1.1.1` through the `wgcf-profile` interface; if the ping fails, it automatically restarts the service.
+* **Start Tunnel:** `sudo systemctl start warp-tunnel`
+* **Stop Tunnel:** `sudo systemctl stop warp-tunnel` (Triggers a full routing/IPTables cleanup)
+* **Check Logs:** `journalctl -u warp-tunnel -f`
+* **Check Tunnel Status:** `wg show`
