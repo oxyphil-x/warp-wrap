@@ -33,3 +33,9 @@ The tunnel is managed as a standard Systemd service.
 * **Stop Tunnel:** `sudo systemctl stop warp-tunnel` (Triggers a full routing/IPTables cleanup)
 * **Check Logs:** `journalctl -u warp-tunnel -f`
 * **Check Tunnel Status:** `wg show`
+
+### Uninstall 
+**Run the uninstaller:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/kfomichev/warp-wrap/main/uninstall-warp.sh -o uninstall-warp.sh && chmod +x uninstall-warp.sh && sudo ./uninstall-warp.sh
+```
