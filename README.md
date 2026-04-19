@@ -17,7 +17,7 @@ The deployment script is designed for Debian/Ubuntu systems. It dynamically dete
 
 **Run the installer:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kfomichev/warp-wrap/main/deploy-warp.sh -o deploy-warp.sh && chmod +x deploy-warp.sh && sudo ./deploy-warp.sh
+curl -fsSL https://raw.githubusercontent.com/oxyphil-x/warp-wrap/main/deploy-warp.sh -o deploy-warp.sh && chmod +x deploy-warp.sh && sudo ./deploy-warp.sh
 ```
 
 **What happens during deployment:**
@@ -37,5 +37,5 @@ The tunnel is managed as a standard Systemd service.
 ### Uninstall 
 **Run the uninstaller:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kfomichev/warp-wrap/main/uninstall-warp.sh -o uninstall-warp.sh && chmod +x uninstall-warp.sh && sudo ./uninstall-warp.sh
+curl -fsSL https://raw.githubusercontent.com/oxyphil-x/warp-wrap/main/uninstall-warp.sh -o uninstall-warp.sh && chmod +x uninstall-warp.sh && sudo ./uninstall-warp.sh
 ```
